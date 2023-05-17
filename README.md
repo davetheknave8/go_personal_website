@@ -1,1 +1,1 @@
-# go_personal_website
+# David Reeves Personal Website with Golang backend and React frontend
