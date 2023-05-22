@@ -1,14 +1,16 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	fmt.Println(sendProjects())
+	router := gin.Default()
+	router.GET("/albums", getProjects)
+
+	router.Run("localhost:8080")
 }
 
 func getProjects(c *gin.Context) {
