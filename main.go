@@ -16,3 +16,15 @@ func main() {
 func getProjects(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, sendProjects())
 }
+
+func postProjects(c *gin.Context) {
+	var newProject project
+
+	err := c.BindJSON(&newProject)
+	if err != nil {
+		return
+	}
+
+	projects = append(projects, newProject)
+	c.IndentedJSON(http.StatusCreated, newProject)
+}
