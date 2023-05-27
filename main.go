@@ -1,6 +1,8 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -51,4 +53,15 @@ func postProjects(c *gin.Context) {
 
 	projects = append(projects, newProject)
 	c.IndentedJSON(http.StatusCreated, newProject)
+}
+
+// DB set up
+func setupDB() *sql.DB {
+	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", dbUser, dbPassword, dbName)
+	db, err := sql.Open("postgres", dbinfo)
+	if err != nil {
+		log.Fatalf("Error loading DB")
+	}
+
+	return db
 }
