@@ -31,10 +31,10 @@ func main() {
 		log.Fatalf("Error loading .env file")
 	}
 	router := mux.NewRouter()
-	router.HandleFunc("/movies/", getProjects).Methods("GET")
+	router.HandleFunc("/projects/", getProjects).Methods("GET")
+	router.HandleFunc("/projects", postProjects).Methods("POST")
 	ginRouter := gin.Default()
 	ginRouter.GET("/projects/:id", getProjectById)
-	ginRouter.POST("/projects", postProjects)
 
 	ginRouter.Run("localhost:8080")
 }
@@ -81,16 +81,33 @@ func getProjectById(c *gin.Context) {
 	}
 }
 
-func postProjects(c *gin.Context) {
-	var newProject project
+func postProjects(w http.ResponseWriter, r *http.Request) {
+	projectID := r.FormValue("projectid")
+	projectName := r.FormValue("projectname")
 
-	err := c.BindJSON(&newProject)
-	if err != nil {
-		return
+	var response = JsonResponse{}
+
+	if projectID == "" || projectName == "" {
+		response = JsonResponse{Type: "error", Message: "You are missing a ProjectID or a ProjectName parameter."}
+	} else {
+		db := setupDB()
+
+		fmt.Println("Inserting movie into DB")
+
+		fmt.Println("Inserting new Project with ID: " + projectID + " and name: " + projectName)
+
+		var lastInsertID int
+		err := db.QueryRow("INSERT INTO projects(projectID, projectName) VALUES($1, $2) returning id;", projectID, projectName).Scan(&lastInsertID)
+
+		// check errors
+		if err != nil {
+			log.Fatalf("Error inserting project into DB")
+		}
+
+		response = JsonResponse{Type: "success", Message: "The project has been inserted successfully!"}
 	}
 
-	projects = append(projects, newProject)
-	c.IndentedJSON(http.StatusCreated, newProject)
+	json.NewEncoder(w).Encode(response)
 }
 
 // DB set up
