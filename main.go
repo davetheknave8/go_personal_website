@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 )
 
@@ -29,15 +30,16 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error loading .env file")
 	}
-	router := gin.Default()
-	router.GET("/projects", getProjects)
-	router.GET("/projects/:id", getProjectById)
-	router.POST("/projects", postProjects)
+	router := mux.NewRouter()
+	router.HandleFunc("/movies/", getProjects).Methods("GET")
+	ginRouter := gin.Default()
+	ginRouter.GET("/projects/:id", getProjectById)
+	ginRouter.POST("/projects", postProjects)
 
-	router.Run("localhost:8080")
+	ginRouter.Run("localhost:8080")
 }
 
-func getProjects(c *gin.Context, w http.ResponseWriter) {
+func getProjects(w http.ResponseWriter, r *http.Request) {
 	db := setupDB()
 
 	fmt.Println("Getting projects...")
