@@ -7,9 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 
-	"github.com/gin-gonic/gin"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 )
@@ -33,10 +31,7 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/projects/", getProjects).Methods("GET")
 	router.HandleFunc("/projects", postProjects).Methods("POST")
-	ginRouter := gin.Default()
-	ginRouter.GET("/projects/:id", getProjectById)
-
-	ginRouter.Run("localhost:8080")
+	router.HandleFunc("/projects/:id", getProjectById).Methods("GET")
 }
 
 func getProjects(w http.ResponseWriter, r *http.Request) {
@@ -71,14 +66,10 @@ func getProjects(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-func getProjectById(c *gin.Context) {
-	id := c.Param("id")
+func getProjectById(w http.ResponseWriter, r *http.Request) {
+	db := setupDB()
 
-	for _, a := range sendProjects() {
-		if strconv.Itoa(a.ID) == id {
-			c.IndentedJSON(http.StatusOK, a)
-		}
-	}
+	fmt.Println("Getting project")
 }
 
 func postProjects(w http.ResponseWriter, r *http.Request) {
