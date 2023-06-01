@@ -70,6 +70,20 @@ func getProjectById(w http.ResponseWriter, r *http.Request) {
 	db := setupDB()
 
 	fmt.Println("Getting project")
+
+	row, err := db.Query("SELECT * FROM PROJECTS WHERE id = %d", r.FormValue("projectid"))
+	if err != nil {
+		log.Fatalf("Unable to retrieve project")
+	}
+
+	var id int
+	var title string
+	var description string
+	var links []string
+
+	err = row.Scan(&id, &title, &description, &links)
+
+	response := JsonResponse{Type: "success", Data: project{ID: id}}
 }
 
 func postProjects(w http.ResponseWriter, r *http.Request) {
